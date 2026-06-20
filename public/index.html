@@ -1,0 +1,2496 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>ARLO AVEN</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=Montserrat:wght@400;500;600&display=swap');
+
+:root {
+  --primary-bg: #2B231D;
+  --header-bg: #1A1512;
+  --accent-gold: #C1B898;
+  --sage-green: #9CAF88;
+  --text-color: #E2DFD2;
+  --box-outline: #C1B898;
+}
+
+html { scroll-behavior: smooth; }
+
+html, body {
+  margin: 0;
+  padding: 0;
+  min-height: 100vh;
+  font-family: 'Montserrat', sans-serif;
+  color: var(--text-color);
+  background-color: var(--primary-bg);
+}
+
+.app-viewport-wrapper {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.main-content-canvas {
+  flex: 1 0 auto;
+}
+
+a { text-decoration: none; color: inherit; transition: opacity 0.3s; cursor: pointer; }
+a:hover { opacity: 0.7; }
+
+header {
+  position: fixed;
+  top: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 98%;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  z-index: 1000;
+  box-sizing: border-box;
+}
+
+.nav-island {
+  background-color: var(--header-bg);
+  padding: 10px 25px;
+  border-radius: 35px;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.4);
+  display: flex;
+  align-items: center;
+  height: 44px;
+  box-sizing: border-box;
+}
+
+.header-left-zone {
+  justify-self: start;
+}
+.header-left-menu {
+  display: flex;
+}
+.hamburger-wrapper {
+  display: none;
+}
+.hamburger { display: flex; flex-direction: column; gap: 5px; cursor: pointer; }
+.hamburger span { display: block; height: 2px; width: 25px; background: var(--accent-gold); border-radius: 2px; }
+
+.header-center-zone {
+  justify-self: center;
+}
+.logo-text {
+  font-family: 'Cormorant Garamond', serif;
+  font-weight: 600;
+  font-size: 22px;
+  text-transform: uppercase;
+  color: var(--accent-gold);
+  letter-spacing: 2px;
+  text-align: center;
+  white-space: nowrap;
+}
+
+.header-right-zone {
+  justify-self: end;
+  display: flex;
+  gap: 15px;
+}
+.account-button { display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--text-color); margin-left: 5px; }
+.account-icon { width: 22px; height: 22px; fill: none; stroke: var(--text-color); stroke-width: 1.5; }
+
+.nav-group {
+  list-style: none;
+  display: flex;
+  gap: 30px;
+  margin: 0;
+  padding: 0;
+}
+.nav-group a { color: var(--text-color); font-size: 11px; text-transform: uppercase; letter-spacing: 1px; font-weight: 500; }
+.mobile-nav-links { display: none; }
+
+.auth-modal-overlay {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(26, 21, 18, 0.85);
+  backdrop-filter: blur(8px);
+  z-index: 2000;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding-top: 75px;
+  padding-left: 14px;
+  padding-right: 14px;
+  box-sizing: border-box;
+  opacity: 0;
+  pointer-events: none;
+  overflow-y: auto;
+  transition: opacity 0.25s ease;
+}
+.auth-modal-overlay.active-modal {
+  opacity: 1;
+  pointer-events: auto;
+}
+.auth-card {
+  max-height: calc(100vh - 95px);
+  overflow-y: auto;
+  background-color: var(--header-bg);
+  border: 2px solid var(--box-outline);
+  border-radius: 10px;
+  width: 90%;
+  max-width: 420px;
+  padding: 40px 30px;
+  box-shadow: 0 15px 40px rgba(0,0,0,0.6);
+  position: relative;
+  box-sizing: border-box;
+  transform: translateY(-8px) scale(0.98);
+  transition: transform 0.25s ease;
+}
+.auth-modal-overlay.active-modal .auth-card {
+  transform: translateY(0) scale(1);
+}
+.close-modal-btn {
+  position: absolute;
+  top: 15px;
+  right: 20px;
+  font-size: 24px;
+  color: var(--accent-gold);
+  cursor: pointer;
+  background: none;
+  border: none;
+}
+.auth-card h3 {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 28px;
+  color: var(--accent-gold);
+  margin-top: 0;
+  margin-bottom: 25px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  text-align: center;
+}
+.auth-form-group {
+  margin-bottom: 20px;
+  display: flex;
+  flex-direction: column;
+}
+.auth-form-group label {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 8px;
+  color: var(--accent-gold);
+}
+.auth-form-group input,
+.auth-form-group textarea {
+  padding: 12px 15px;
+  font-size: 14px;
+  border: 1px solid rgba(193, 184, 152, 0.4);
+  background: rgba(43, 35, 29, 0.6);
+  color: #fff;
+  border-radius: 4px;
+  outline: none;
+  font-family: 'Montserrat', sans-serif;
+  transition: border-color 0.3s;
+}
+.auth-form-group input:focus,
+.auth-form-group textarea:focus {
+  border-color: var(--accent-gold);
+}
+.auth-form-group textarea {
+  min-height: 110px;
+  resize: vertical;
+}
+.auth-submit-btn {
+  width: 100%;
+  padding: 14px;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  color: var(--header-bg);
+  background-color: var(--accent-gold);
+  border: 2px solid var(--accent-gold);
+  border-radius: 4px;
+  cursor: pointer;
+  margin-top: 10px;
+  transition: all 0.3s;
+}
+.auth-submit-btn:hover {
+  background-color: transparent;
+  color: var(--accent-gold);
+}
+.auth-form-block {
+  display: none;
+}
+.auth-form-block.active-form {
+  display: block;
+}
+
+.view-panel {
+  display: none;
+}
+.view-panel.active-view {
+  display: block;
+}
+
+.hero-banner-wrapper {
+  position: relative;
+  width: 100%;
+  height: 38vh;
+  margin-top: 75px;
+  overflow: hidden;
+  background-color: #1A1512;
+  z-index: 1;
+}
+.hero-banner-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: brightness(0.8);
+  position: relative;
+  z-index: 2;
+}
+
+.banner-cta-container {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+  z-index: 20;
+  width: 90%;
+  max-width: 400px;
+}
+.carousel-btn {
+  display: inline-block;
+  padding: 12px 30px;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  color: var(--header-bg);
+  background-color: var(--accent-gold);
+  border: 2px solid var(--accent-gold);
+  border-radius: 4px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.6);
+  transition: all 0.3s ease;
+}
+.carousel-btn:hover {
+  background-color: transparent;
+  color: var(--accent-gold);
+  transform: translateY(-2px);
+}
+
+.creative-parallax-divider {
+  height: 12vh;
+  position: relative;
+  background-color: var(--header-bg);
+  clip-path: polygon(0 0, 100% 0, 100% 60%, 0% 100%);
+  margin-bottom: -4vh;
+  z-index: 3;
+}
+
+.hero {
+  min-height: auto;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  padding: 0px 20px 30px 20px;
+  position: relative;
+  background-color: var(--primary-bg);
+  z-index: 4;
+}
+.hero h1 {
+  font-family: 'Cormorant Garamond', serif;
+  font-weight: 400;
+  font-size: clamp(28px, 4.5vw, 55px);
+  color: var(--text-color);
+  margin-bottom: 20px;
+  line-height: 1.2;
+}
+.hero h1 span {
+  display: block;
+  text-align: center;
+  color: var(--sage-green);
+  font-weight: 500;
+}
+#email-form {
+  display: flex;
+  gap: 10px;
+  position: relative;
+  width: 100%;
+  max-width: 500px;
+}
+#email-form input[type="email"] {
+  padding: 12px 20px;
+  font-size: 14px;
+  border: 2px solid var(--accent-gold);
+  background: rgba(26,21,18,0.8);
+  color: #fff;
+  border-radius: 2px;
+  flex: 1;
+}
+#email-form button {
+  padding: 12px 25px;
+  font-size: 14px;
+  border: 2px solid var(--accent-gold);
+  background-color: var(--accent-gold);
+  color: var(--header-bg);
+  cursor: pointer;
+  border-radius: 2px;
+  font-weight: 600;
+  transition: 0.3s;
+}
+#email-form button:hover {
+  background-color: transparent;
+  color: var(--accent-gold);
+}
+
+.creative-section-divider {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  max-width: 600px;
+  margin: 40px auto 30px auto;
+}
+.divider-line-left,
+.divider-line-right {
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(to right, transparent, rgba(193, 184, 152, 0.6));
+}
+.divider-line-right {
+  background: linear-gradient(to left, transparent, rgba(193, 184, 152, 0.6));
+}
+.divider-center-spec {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 15px;
+}
+.spec-box {
+  width: 6px;
+  height: 6px;
+  border: 1px solid var(--accent-gold);
+}
+.spec-box.filled {
+  background-color: var(--accent-gold);
+  transform: scale(1.3);
+}
+.spec-cross {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 10px;
+  color: var(--accent-gold);
+  letter-spacing: 1px;
+}
+
+.about-us {
+  scroll-margin-top: 130px;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: 40px;
+  padding: 40px 30px;
+  border: 2px solid var(--box-outline);
+  border-radius: 15px;
+  max-width: 1500px;
+  margin: 10px auto 40px auto;
+  background-color: rgba(26,21,18,0.6);
+  box-sizing: border-box;
+}
+.about-text,
+.about-image {
+  flex: 1;
+  min-width: 300px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+.about-text h2 {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 28px;
+  color: var(--accent-gold);
+  margin-bottom: 15px;
+  margin-top: 0;
+}
+.about-text p {
+  text-align: justify;
+  line-height: 1.7;
+  margin: 0;
+}
+.about-image img {
+  width: 100%;
+  height: auto;
+  border-radius: 15px;
+  object-fit: cover;
+}
+
+.dynamic-sub-page {
+  max-width: 1500px;
+  margin: 140px auto 80px auto;
+  padding: 50px 40px;
+  border: 1px dashed rgba(193, 184, 152, 0.35);
+  border-radius: 15px;
+  background-color: rgba(26, 21, 18, 0.7);
+  box-sizing: border-box;
+}
+.dynamic-sub-page h2 {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 36px;
+  color: var(--accent-gold);
+  margin-top: 0;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+}
+.dynamic-sub-page p {
+  font-size: 15px;
+  line-height: 1.8;
+  opacity: 0.95;
+}
+
+.product-matrix-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 45px;
+  margin-top: 60px;
+  position: relative;
+}
+.product-node-row {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  width: 100%;
+  max-width: 750px;
+  z-index: 2;
+  cursor: pointer;
+  transition: transform 0.3s ease;
+}
+.product-node-row:hover {
+  transform: translateX(10px);
+}
+.product-circle {
+  width: 95px;
+  height: 95px;
+  min-width: 95px;
+  border-radius: 50%;
+  background-color: var(--header-bg);
+  border: 2px solid rgba(193, 184, 152, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 6px 15px rgba(0,0,0,0.3);
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+.product-node-row:hover .product-circle {
+  border-color: var(--accent-gold);
+  background-color: var(--primary-bg);
+  box-shadow: 0 0 20px rgba(193, 184, 152, 0.3);
+}
+.product-sketch-icon {
+  width: 40px;
+  height: 40px;
+  stroke: var(--accent-gold);
+  stroke-width: 1.2;
+  fill: none;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  transition: stroke-width 0.3s;
+}
+.product-node-row:hover .product-sketch-icon {
+  stroke-width: 1.6;
+}
+.product-node-meta {
+  margin-left: 40px;
+}
+.product-node-meta h4 {
+  margin: 0;
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 28px;
+  letter-spacing: 1px;
+  color: var(--text-color);
+  transition: color 0.3s;
+}
+.product-node-row:hover .product-node-meta h4 {
+  color: var(--accent-gold);
+}
+.product-node-meta p {
+  margin: 4px 0 0 0;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  color: var(--sage-green);
+  opacity: 0.9;
+}
+
+.brand-quote-container {
+  text-align: center;
+  padding: 30px 20px;
+  margin-bottom: 40px;
+  border-left: 3px solid var(--accent-gold);
+  border-right: 3px solid var(--accent-gold);
+  background: rgba(26, 21, 18, 0.4);
+}
+.brand-quote-text {
+  font-family: 'Cormorant Garamond', serif;
+  font-style: italic;
+  font-size: 26px;
+  line-height: 1.4;
+  color: var(--text-color);
+  margin: 0 0 10px 0;
+}
+.brand-quote-moq {
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  color: var(--accent-gold);
+  font-weight: 600;
+  margin: 0;
+}
+
+.services-grid-layout {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 30px;
+  margin-top: 20px;
+}
+.service-card {
+  border: 1px solid rgba(193, 184, 152, 0.2);
+  padding: 35px 30px;
+  border-radius: 12px;
+  background: linear-gradient(145deg, rgba(35,28,24,0.9), rgba(20,16,14,0.9));
+  position: relative;
+  overflow: hidden;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+.service-card:hover {
+  transform: translateY(-5px);
+  border-color: var(--accent-gold);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.6);
+}
+.service-badge {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  font-size: 9px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  background: rgba(193, 184, 152, 0.15);
+  color: var(--accent-gold);
+  padding: 4px 10px;
+  border-radius: 4px;
+  font-weight: 500;
+}
+.service-card-footer-notice {
+  margin-top: 20px;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--sage-green);
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.fabric-showcase-section {
+  margin-top: 45px;
+  padding: 50px 30px;
+  border: 1px solid rgba(193, 184, 152, 0.25);
+  border-radius: 18px;
+  background: radial-gradient(circle at top, rgba(193, 184, 152, 0.10), rgba(26, 21, 18, 0.45));
+  box-sizing: border-box;
+}
+
+.fabric-showcase-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 30px;
+  color: var(--accent-gold);
+  text-align: center;
+  margin: 0 0 10px 0;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+}
+
+.fabric-showcase-subtitle {
+  text-align: center;
+  max-width: 850px;
+  margin: 0 auto 28px auto;
+  font-size: 14px;
+  line-height: 1.8;
+  opacity: 0.9;
+}
+
+.fabric-percentage-line {
+  text-align: center;
+  margin: 0 auto 38px auto;
+  padding: 16px 22px;
+  max-width: 900px;
+  border: 1px solid rgba(156, 175, 136, 0.45);
+  border-radius: 30px;
+  background: rgba(156, 175, 136, 0.08);
+  color: var(--sage-green);
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+.fabric-circle-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(135px, 1fr));
+  gap: 30px 22px;
+  justify-items: center;
+}
+
+.fabric-circle-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.fabric-circle {
+  width: 112px;
+  height: 112px;
+  border-radius: 50%;
+  border: 2px solid rgba(193, 184, 152, 0.55);
+  box-shadow: 0 8px 22px rgba(0,0,0,0.45), inset 0 0 18px rgba(255,255,255,0.08);
+  margin-bottom: 12px;
+  transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+  background-size: cover;
+}
+
+.fabric-circle-item:hover .fabric-circle {
+  transform: translateY(-6px) scale(1.04);
+  border-color: var(--accent-gold);
+  box-shadow: 0 14px 35px rgba(0,0,0,0.65), 0 0 18px rgba(193,184,152,0.28);
+}
+
+.fabric-circle-item span {
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--text-color);
+  line-height: 1.4;
+}
+
+.fabric-cotton { background: radial-gradient(circle at 30% 30%, #fffaf0 0 10%, #efe6d0 11% 24%, #cabd9f 25% 45%, #f7efd9 46% 70%, #b8aa8b 71% 100%); }
+.fabric-polyester { background: linear-gradient(135deg, #f1f1f3, #8f969d 35%, #d6d8dc 55%, #666d76 100%); }
+.fabric-nylon { background: repeating-linear-gradient(45deg, #e7e7e7 0 5px, #9b9b9b 5px 10px, #cfcfcf 10px 15px); }
+.fabric-linen { background: repeating-linear-gradient(0deg, #d8c39e 0 4px, #9e8761 4px 8px), repeating-linear-gradient(90deg, rgba(255,255,255,0.2) 0 3px, rgba(0,0,0,0.08) 3px 6px); }
+.fabric-denim { background: repeating-linear-gradient(135deg, #1e3658 0 6px, #385f8c 6px 12px, #10233c 12px 18px); }
+.fabric-fleece { background: radial-gradient(circle at 35% 35%, #f1eadf 0 8%, #cfc4b5 9% 25%, #958676 26% 50%, #e7dccf 51% 75%, #786b5f 76% 100%); }
+.fabric-jersey { background: repeating-linear-gradient(90deg, #3e4038 0 5px, #8d907d 5px 9px, #c0c1ad 9px 13px); }
+.fabric-rib { background: repeating-linear-gradient(90deg, #5f5748 0 6px, #b2a488 6px 12px, #7e735f 12px 18px); }
+.fabric-suede { background: radial-gradient(circle at 35% 35%, #c89c6c 0 12%, #96663f 13% 42%, #5a3822 43% 75%, #b47d51 76% 100%); }
+.fabric-cashmere { background: radial-gradient(circle at 40% 35%, #efe0c8 0 12%, #c6aa8d 13% 35%, #8e735d 36% 60%, #dcc7ad 61% 100%); }
+
+.special-offer-banner {
+  margin-top: 40px;
+  padding: 45px 35px;
+  border: 2px solid var(--accent-gold);
+  border-radius: 16px;
+  background: linear-gradient(135deg, rgba(26,21,18,0.95) 0%, rgba(45,38,32,0.95) 50%, rgba(26,21,18,0.95) 100%);
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 0 20px rgba(193, 184, 152, 0.15);
+  animation: goldPulse 4s infinite ease-in-out;
+  transition: transform 0.4s cubic-bezier(0.25, 0.8, 0.25, 1), box-shadow 0.4s ease, border-color 0.4s ease;
+}
+
+.special-offer-banner:hover {
+  transform: translateY(-4px);
+  border-color: #FFF;
+  box-shadow: 0 15px 40px rgba(193, 184, 152, 0.35);
+}
+
+.special-offer-banner::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -150%;
+  width: 60%;
+  height: 200%;
+  background: linear-gradient(to right, transparent 0%, rgba(255, 243, 180, 0.25) 30%, rgba(193, 184, 152, 0.5) 50%, rgba(255, 243, 180, 0.25) 70%, transparent 100%);
+  transform: rotate(25deg);
+  transition: none;
+}
+
+.special-offer-banner:hover::before {
+  left: 180%;
+  transition: left 1.2s cubic-bezier(0.1, 0.2, 0.3, 1);
+}
+
+.wc-sparkle {
+  position: absolute;
+  color: rgba(193, 184, 152, 0.95);
+  font-size: 16px;
+  pointer-events: none;
+  animation: sparkleAnim 2.5s infinite ease-in-out both;
+  transform-origin: center center;
+  opacity: 0;
+}
+.sp-1 { top: 15px; left: 15%; animation-delay: 0s; }
+.sp-2 { bottom: 20px; right: 12%; animation-delay: 0.5s; }
+.sp-3 { top: 50%; right: 6%; animation-delay: 1s; }
+
+.wc-interactive-container {
+  margin-top: 30px;
+  position: relative;
+  z-index: 5;
+}
+
+.wc-tabs-nav {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 25px;
+}
+
+.wc-tab-pill {
+  background: rgba(26, 21, 18, 0.8);
+  border: 1px solid rgba(193, 184, 152, 0.3);
+  color: var(--text-color);
+  padding: 10px 20px;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  border-radius: 25px;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+.wc-tab-pill:hover, .wc-tab-pill.active-wc-pill {
+  background-color: var(--accent-gold);
+  color: var(--header-bg);
+  border-color: var(--accent-gold);
+  box-shadow: 0 0 15px rgba(193, 184, 152, 0.6);
+  transform: scale(1.04);
+}
+
+.wc-dynamic-display {
+  background: rgba(26, 21, 18, 0.5);
+  border: 1px solid rgba(193, 184, 152, 0.15);
+  border-left: 3px solid var(--accent-gold);
+  border-radius: 8px;
+  padding: 25px 30px;
+  min-height: 70px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#wc-display-text {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.8;
+  text-align: justify;
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+@keyframes goldPulse {
+  0% { box-shadow: 0 0 20px rgba(193, 184, 152, 0.15); }
+  50% { box-shadow: 0 0 35px rgba(193, 184, 152, 0.3); }
+  100% { box-shadow: 0 0 20px rgba(193, 184, 152, 0.15); }
+}
+
+@keyframes sparkleAnim {
+  0% { transform: scale(0.2) rotate(0deg); opacity: 0; }
+  30% { transform: scale(1.1) rotate(15deg); opacity: 1; }
+  60% { transform: scale(0.9) rotate(-12deg); opacity: 0.8; }
+  100% { transform: scale(0.2) rotate(0deg); opacity: 0; }
+}
+
+.purpose-sectors-container {
+  margin-top: 40px;
+  padding: 35px 30px;
+  border: 1px solid rgba(193, 184, 152, 0.2);
+  border-radius: 12px;
+  background-color: rgba(26, 21, 18, 0.3);
+  box-sizing: border-box;
+}
+.purpose-sectors-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 26px;
+  color: var(--accent-gold);
+  margin-top: 0;
+  margin-bottom: 20px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  text-align: center;
+}
+.purpose-sectors-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 15px;
+}
+.purpose-sector-item {
+  background: rgba(193, 184, 152, 0.05);
+  border-left: 2px solid var(--sage-green);
+  padding: 12px 18px;
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 0.5px;
+}
+
+.consultation-cta-banner {
+  margin-top: 40px;
+  padding: 22px 30px;
+  background: rgba(193, 184, 152, 0.08);
+  border: 1px solid rgba(193, 184, 152, 0.3);
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  box-sizing: border-box;
+}
+.consultation-text-wrapper { flex: 1; }
+.consultation-title {
+  margin: 0 0 4px 0;
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 20px;
+  letter-spacing: 0.5px;
+  color: var(--accent-gold);
+}
+.consultation-desc {
+  margin: 0;
+  font-size: 13px;
+  opacity: 0.85;
+  line-height: 1.4;
+}
+.whatsapp-consult-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  background-color: #25D366;
+  color: #1A1512;
+  padding: 9px 16px;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  box-shadow: 0 4px 12px rgba(37, 211, 102, 0.2);
+  transition: all 0.3s ease;
+  white-space: nowrap;
+  width: auto;
+  max-width: 135px;
+  box-sizing: border-box;
+}
+.whatsapp-consult-btn:hover {
+  background-color: #20ba56;
+  transform: translateY(-2px);
+  opacity: 1;
+}
+.whatsapp-icon-svg {
+  width: 16px;
+  height: 16px;
+  fill: currentColor;
+}
+
+.ready-box {
+  margin-top: 40px;
+  padding: 42px 35px;
+  border: 2px solid var(--accent-gold);
+  border-radius: 16px;
+  text-align: center;
+  background: linear-gradient(135deg, rgba(193,184,152,0.08), rgba(26,21,18,0.65));
+  box-shadow: 0 10px 28px rgba(0,0,0,0.35);
+  box-sizing: border-box;
+}
+.ready-box h3 {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 34px;
+  color: var(--accent-gold);
+  margin: 0 0 14px 0;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+}
+.ready-box p {
+  max-width: 760px;
+  margin: 0 auto 26px auto;
+  line-height: 1.8;
+  font-size: 14px;
+  opacity: 0.92;
+}
+.ready-btn {
+  padding: 14px 32px;
+  border: 2px solid var(--accent-gold);
+  background: var(--accent-gold);
+  color: var(--header-bg);
+  cursor: pointer;
+  font-weight: 600;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  transition: 0.3s;
+  border-radius: 4px;
+  font-family: 'Montserrat', sans-serif;
+}
+.ready-btn:hover {
+  background: transparent;
+  color: var(--accent-gold);
+}
+
+footer {
+  flex-shrink: 0;
+  background-color: var(--header-bg);
+  padding: 40px 20px;
+  text-align: center;
+  margin-top: 80px;
+  overflow: hidden;
+}
+.footer-logo {
+  font-family: 'Cormorant Garamond', serif;
+  font-weight: 600;
+  font-size: 24px;
+  color: var(--accent-gold);
+  margin-bottom: 20px;
+  text-transform: uppercase;
+}
+.footer-links {
+  list-style: none;
+  padding: 0;
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 30px;
+  margin-bottom: 20px;
+  font-size: 13px;
+  text-transform: uppercase;
+}
+.footer-line {
+  width: 60px;
+  height: 1px;
+  background-color: rgba(193,184,152,0.3);
+  margin: 0 auto 15px auto;
+}
+.est-date {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 12px;
+  color: var(--accent-gold);
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  margin-bottom: 10px;
+}
+.copyright-text {
+  font-size: 11px;
+  color: var(--text-color);
+  opacity: 0.6;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  margin: 0;
+}
+
+@media(max-width: 1024px){
+  .about-us { margin: 20px; }
+  .about-text, .about-image { width: 100%; min-width: unset; }
+  .dynamic-sub-page { margin: 120px 20px 60px 20px; padding: 40px 30px; }
+}
+
+@media(max-width: 820px) {
+  header {
+    display: flex;
+    justify-content: space-between;
+    width: 92%;
+  }
+  .header-left-menu, .header-right-menu { display: none; }
+  .hamburger-wrapper { display: flex; }
+  .mobile-nav-links {
+    display: none;
+    list-style: none;
+    flex-direction: column;
+    gap: 15px;
+    margin: 0;
+    padding: 20px;
+    background-color: var(--header-bg);
+    border-radius: 20px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.5);
+    position: absolute;
+    top: 60px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 95%;
+    box-sizing: border-box;
+    text-align: center;
+    z-index: 1010;
+  }
+  .mobile-nav-links.show { display: flex; }
+  .mobile-nav-links a { color: var(--text-color); font-size: 14px; text-transform: uppercase; display: block; padding: 5px 0; }
+  .hero-banner-wrapper { height: 32vh; margin-top: 75px; }
+  .creative-parallax-divider { height: 8vh; margin-bottom: -2vh; }
+  .dynamic-sub-page {
+    margin-top: 100px;
+    margin-left: 15px;
+    margin-right: 15px;
+    padding: 30px 20px;
+  }
+  .dynamic-sub-page h2 { font-size: 28px; }
+  .brand-quote-text { font-size: 20px; }
+  .services-grid-layout { grid-template-columns: 1fr; gap: 20px; }
+  .service-card { padding: 25px 20px; }
+  .fabric-showcase-section { padding: 35px 18px; }
+  .fabric-showcase-title { font-size: 24px; }
+  .fabric-circle-grid { grid-template-columns: repeat(auto-fit, minmax(105px, 1fr)); gap: 24px 14px; }
+  .fabric-circle { width: 88px; height: 88px; }
+  .purpose-sectors-container { padding: 25px 20px; margin-top: 30px; }
+  .purpose-sectors-title { font-size: 22px; }
+  .consultation-cta-banner { flex-direction: column; align-items: flex-start; padding: 20px; gap: 15px; }
+  .whatsapp-consult-btn {
+    width: auto;
+    max-width: 135px;
+    justify-content: center;
+    align-self: flex-start;
+  }
+  .ready-box { padding: 32px 20px; }
+  .ready-box h3 { font-size: 26px; }
+  .ready-btn { width: 100%; }
+  .product-matrix-container { gap: 20px; }
+  .product-circle { width: 66px; height: 66px; min-width: 66px; }
+  .product-sketch-icon { width: 34px; height: 34px; }
+  .product-node-meta h4 { font-size: 19px; }
+  #email-form { flex-direction: column; gap: 10px; }
+  #email-form input, #email-form button { width: 100%; box-sizing: border-box; }
+}
+
+@media (max-width: 480px) {
+  .logo-text { font-size: 18px; letter-spacing: 1px; }
+  .nav-island { padding: 10px 15px; }
+  .dynamic-sub-page { padding: 25px 15px; margin-top: 90px; }
+}
+
+/* Strong responsive fixes for tablet and mobile */
+@media(max-width: 1024px) {
+  header {
+    width: 94%;
+  }
+  .dynamic-sub-page {
+    max-width: calc(100% - 40px);
+  }
+  .product-node-row {
+    max-width: 680px;
+  }
+  .about-us {
+    flex-direction: column;
+    gap: 28px;
+    padding: 35px 24px;
+  }
+  .about-text, .about-image {
+    min-width: 0;
+    width: 100%;
+  }
+  .about-text p {
+    text-align: left;
+  }
+}
+
+@media(max-width: 820px) {
+  body {
+    overflow-x: hidden;
+  }
+  header {
+    width: 92%;
+    gap: 8px;
+  }
+  .nav-island {
+    padding: 9px 14px;
+  }
+  .hero h1 {
+    font-size: clamp(26px, 8vw, 42px);
+  }
+  .about-us {
+    margin: 10px 15px 35px 15px;
+    padding: 28px 20px;
+  }
+  .about-text h2 {
+    text-align: center;
+    font-size: 26px;
+  }
+  .about-text p {
+    font-size: 14px;
+    line-height: 1.75;
+  }
+  .about-image img {
+    max-height: 300px;
+    object-fit: cover;
+  }
+  .product-node-row {
+    max-width: 100%;
+    align-items: center;
+  }
+  .product-node-meta {
+    margin-left: 22px;
+  }
+  .product-node-meta h4 {
+    font-size: 23px;
+  }
+  .product-node-meta p {
+    font-size: 10px;
+    line-height: 1.5;
+  }
+  .services-grid-layout {
+    grid-template-columns: 1fr;
+  }
+  .fabric-circle-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .ready-box p,
+  .fabric-showcase-subtitle,
+  .dynamic-sub-page p {
+    text-align: left;
+  }
+  .auth-card {
+    width: calc(100% - 28px);
+    padding: 32px 20px;
+  }
+}
+
+@media(max-width: 480px) {
+  .header-center-zone .nav-island {
+    max-width: 150px;
+  }
+  .logo-text {
+    font-size: 16px;
+  }
+  .hero-banner-wrapper {
+    height: 28vh;
+  }
+  .hero {
+    padding: 0 16px 24px 16px;
+  }
+  .creative-section-divider {
+    width: calc(100% - 30px);
+    margin: 30px auto 24px auto;
+  }
+  .dynamic-sub-page {
+    max-width: calc(100% - 24px);
+    margin: 95px 12px 50px 12px;
+    padding: 26px 16px;
+  }
+  .product-matrix-container {
+    gap: 32px;
+    margin-top: 38px;
+  }
+  .product-circle {
+    width: 72px;
+    height: 72px;
+    min-width: 72px;
+  }
+  .product-sketch-icon {
+    width: 34px;
+    height: 34px;
+  }
+  .product-node-meta {
+    margin-left: 16px;
+  }
+  .product-node-meta h4 {
+    font-size: 20px;
+  }
+  .fabric-circle {
+    width: 82px;
+    height: 82px;
+  }
+  .fabric-circle-item span {
+    font-size: 10px;
+  }
+  .consultation-cta-banner,
+  .ready-box,
+  .fabric-showcase-section,
+  .purpose-sectors-container,
+  .special-offer-banner {
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+  .special-offer-banner p {
+    padding: 0 !important;
+  }
+  .footer-links {
+    flex-direction: column;
+    gap: 14px;
+  }
+}
+
+.about-us,
+.dynamic-sub-page,
+.fabric-showcase-section,
+.purpose-sectors-container,
+.special-offer-banner,
+.ready-box,
+.consultation-cta-banner {
+  width: min(96%, 1500px);
+}
+
+.dynamic-sub-page {
+  border-radius: 10px;
+}
+
+.about-us {
+  border-radius: 10px;
+}
+
+.service-card,
+.purpose-sectors-container,
+.special-offer-banner,
+.fabric-showcase-section,
+.ready-box,
+.consultation-cta-banner {
+  border-radius: 10px;
+}
+
+.services-grid-layout {
+  grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
+}
+
+.product-node-row {
+  max-width: 900px;
+}
+
+.brand-quote-container {
+  max-width: 1500px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+@media(max-width: 820px) {
+  .about-us,
+  .dynamic-sub-page,
+  .fabric-showcase-section,
+  .purpose-sectors-container,
+  .special-offer-banner,
+  .ready-box,
+  .consultation-cta-banner {
+    width: auto;
+  }
+
+  .services-grid-layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+.services-page-layout {
+  width: min(96%, 1500px);
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.services-page-layout > .brand-quote-container,
+.services-page-layout > .services-grid-layout,
+.services-page-layout > .fabric-showcase-section,
+.services-page-layout > .purpose-sectors-container,
+.services-page-layout > .special-offer-banner,
+.services-page-layout > .ready-box,
+.services-page-layout > .consultation-cta-banner {
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+.services-grid-layout {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 28px;
+  align-items: stretch;
+}
+
+.service-card {
+  height: 100%;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+}
+
+.service-card p {
+  flex: 1;
+}
+
+.fabric-circle-grid {
+  grid-template-columns: repeat(5, minmax(120px, 1fr));
+  justify-items: center;
+}
+
+.purpose-sectors-grid {
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+}
+
+.about-us {
+  scroll-margin-top: 130px;
+}
+
+@media(max-width: 1024px) {
+  .services-page-layout {
+    width: calc(100% - 40px);
+    padding-left: 28px;
+    padding-right: 28px;
+  }
+
+  .services-grid-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .fabric-circle-grid {
+    grid-template-columns: repeat(3, minmax(110px, 1fr));
+  }
+}
+
+@media(max-width: 820px) {
+  .services-page-layout {
+    width: calc(100% - 28px);
+    margin-left: 14px;
+    margin-right: 14px;
+    padding: 26px 16px;
+  }
+
+  .services-page-layout > .brand-quote-container,
+  .services-page-layout > .services-grid-layout,
+  .services-page-layout > .fabric-showcase-section,
+  .services-page-layout > .purpose-sectors-container,
+  .services-page-layout > .special-offer-banner,
+  .services-page-layout > .ready-box,
+  .services-page-layout > .consultation-cta-banner {
+    width: 100%;
+  }
+
+  .fabric-circle-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .purpose-sectors-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .brand-quote-container,
+  .fabric-showcase-section,
+  .purpose-sectors-container,
+  .special-offer-banner,
+  .ready-box,
+  .consultation-cta-banner {
+    margin-left: 0;
+    margin-right: 0;
+  }
+}
+
+@media(max-width: 480px) {
+  .services-page-layout {
+    width: calc(100% - 20px);
+    margin-left: 10px;
+    margin-right: 10px;
+    padding: 24px 14px;
+  }
+
+  .service-card {
+    padding: 24px 18px;
+  }
+
+  .fabric-circle-grid {
+    gap: 22px 10px;
+  }
+
+  .fabric-circle {
+    width: 78px;
+    height: 78px;
+  }
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
+body {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+img,
+svg,
+video {
+  max-width: 100%;
+}
+
+.main-content-canvas,
+.view-panel,
+.dynamic-sub-page,
+.about-us,
+.services-page-layout,
+.fabric-showcase-section,
+.purpose-sectors-container,
+.special-offer-banner,
+.ready-box,
+.consultation-cta-banner {
+  max-width: 100%;
+}
+
+.dynamic-sub-page,
+.about-us,
+.services-page-layout {
+  width: min(94vw, 1420px);
+}
+
+@media (max-width: 1024px) {
+  header {
+    width: calc(100% - 24px);
+    top: 8px;
+  }
+
+  .nav-island {
+    height: 42px;
+    padding: 9px 16px;
+  }
+
+  .nav-group {
+    gap: 18px;
+  }
+
+  .nav-group a {
+    font-size: 10px;
+    letter-spacing: 0.8px;
+  }
+
+  .logo-text {
+    font-size: 19px;
+    letter-spacing: 1.5px;
+  }
+
+  .hero-banner-wrapper {
+    height: clamp(230px, 34vh, 360px);
+    margin-top: 68px;
+  }
+
+  .hero {
+    padding: 0 24px 26px 24px;
+  }
+
+  .hero h1 {
+    font-size: clamp(30px, 5.5vw, 46px);
+    line-height: 1.12;
+    margin: 14px 0 18px 0;
+  }
+
+  #email-form {
+    max-width: 560px;
+  }
+
+  .about-us,
+  .dynamic-sub-page,
+  .services-page-layout {
+    width: calc(100% - 32px);
+    margin-left: 16px;
+    margin-right: 16px;
+  }
+
+  .about-us {
+    gap: 24px;
+    padding: 30px 22px;
+  }
+
+  .about-text h2,
+  .dynamic-sub-page h2 {
+    font-size: clamp(26px, 4vw, 34px);
+  }
+
+  .about-text p,
+  .dynamic-sub-page p,
+  .service-card p,
+  #wc-display-text,
+  .fabric-showcase-subtitle {
+    font-size: 14px;
+    line-height: 1.65;
+    text-align: left !important;
+  }
+
+  .services-grid-layout {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 20px;
+  }
+
+  .fabric-circle-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+  .product-node-row {
+    max-width: 820px;
+  }
+
+  .product-node-meta h4 {
+    font-size: 25px;
+  }
+}
+
+@media (max-width: 820px) {
+  header {
+    width: calc(100% - 18px);
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    gap: 6px;
+    align-items: center;
+  }
+
+  .header-left-zone,
+  .header-center-zone,
+  .header-right-zone {
+    min-width: 0;
+  }
+
+  .header-left-menu,
+  .header-right-menu {
+    display: none !important;
+  }
+
+  .hamburger-wrapper {
+    display: flex !important;
+  }
+
+  .header-right-zone {
+    justify-self: end;
+    gap: 0;
+  }
+
+  .header-center-zone {
+    justify-self: center;
+  }
+
+  .nav-island {
+    height: 40px;
+    padding: 8px 12px;
+    border-radius: 24px;
+  }
+
+  .header-center-zone .nav-island {
+    max-width: none;
+  }
+
+  .logo-text {
+    font-size: clamp(15px, 4vw, 18px);
+    letter-spacing: 1px;
+  }
+
+  .mobile-nav-links {
+    top: 54px;
+    width: calc(100vw - 22px);
+    left: 50%;
+    padding: 14px;
+    gap: 10px;
+  }
+
+  .mobile-nav-links a {
+    font-size: 12px;
+    padding: 8px 0;
+  }
+
+  .hero-banner-wrapper {
+    height: clamp(210px, 32vh, 300px);
+    margin-top: 62px;
+  }
+
+  .carousel-btn {
+    padding: 10px 22px;
+    font-size: 11px;
+  }
+
+  .creative-parallax-divider {
+    height: 44px;
+    margin-bottom: -16px;
+  }
+
+  .hero {
+    padding: 8px 16px 24px 16px;
+  }
+
+  .hero h1 {
+    font-size: clamp(28px, 8vw, 38px);
+    line-height: 1.08;
+    margin-bottom: 16px;
+  }
+
+  #email-form {
+    width: 100%;
+    max-width: 460px;
+    flex-direction: column;
+  }
+
+  #email-form input[type="email"],
+  #email-form button {
+    width: 100%;
+    min-height: 44px;
+    font-size: 13px;
+  }
+
+  .creative-section-divider {
+    width: calc(100% - 28px);
+    margin: 28px auto 22px auto;
+  }
+
+  .about-us,
+  .dynamic-sub-page,
+  .services-page-layout {
+    width: calc(100% - 24px) !important;
+    margin-left: 12px !important;
+    margin-right: 12px !important;
+  }
+
+  .dynamic-sub-page,
+  .services-page-layout {
+    margin-top: 84px !important;
+    padding: 24px 16px !important;
+  }
+
+  .about-us {
+    flex-direction: column;
+    padding: 24px 16px;
+    gap: 18px;
+    margin-top: 8px !important;
+  }
+
+  .about-text,
+  .about-image {
+    min-width: 0 !important;
+    width: 100%;
+  }
+
+  .about-text h2,
+  .dynamic-sub-page h2,
+  .fabric-showcase-title,
+  .purpose-sectors-title {
+    font-size: clamp(23px, 6vw, 30px);
+    line-height: 1.15;
+    text-align: center;
+  }
+
+  .about-text p,
+  .dynamic-sub-page p,
+  .service-card p,
+  .fabric-showcase-subtitle,
+  #wc-display-text,
+  .ready-box p {
+    font-size: 13px;
+    line-height: 1.6;
+    word-spacing: normal;
+    letter-spacing: normal;
+    text-align: left !important;
+  }
+
+  .about-image img {
+    width: 100%;
+    max-height: 260px;
+    object-fit: cover;
+  }
+
+  .product-matrix-container {
+    gap: 24px;
+    margin-top: 34px;
+  }
+
+  .product-node-row {
+    width: 100%;
+    max-width: 100%;
+    align-items: center;
+  }
+
+  .product-node-row:hover {
+    transform: none;
+  }
+
+  .product-circle {
+    width: clamp(62px, 18vw, 82px);
+    height: clamp(62px, 18vw, 82px);
+    min-width: clamp(62px, 18vw, 82px);
+  }
+
+  .product-sketch-icon {
+    width: clamp(30px, 8vw, 38px);
+    height: clamp(30px, 8vw, 38px);
+  }
+
+  .product-node-meta {
+    margin-left: 16px;
+    min-width: 0;
+  }
+
+  .product-node-meta h4 {
+    font-size: clamp(18px, 5.2vw, 23px);
+    line-height: 1.15;
+  }
+
+  .product-node-meta p {
+    font-size: 10px;
+    line-height: 1.35;
+    letter-spacing: 0.8px;
+  }
+
+  .brand-quote-container {
+    padding: 22px 14px;
+    margin-bottom: 24px;
+  }
+
+  .brand-quote-text {
+    font-size: clamp(20px, 6vw, 26px);
+  }
+
+  .services-grid-layout {
+    grid-template-columns: 1fr !important;
+    gap: 16px;
+  }
+
+  .service-card {
+    padding: 24px 18px;
+  }
+
+  .service-card h3 {
+    font-size: 24px;
+    margin-top: 8px;
+    margin-bottom: 10px;
+  }
+
+  .fabric-showcase-section,
+  .purpose-sectors-container,
+  .special-offer-banner,
+  .ready-box,
+  .consultation-cta-banner {
+    width: 100% !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+    padding: 24px 16px !important;
+  }
+
+  .fabric-percentage-line {
+    font-size: 11px;
+    line-height: 1.4;
+    border-radius: 18px;
+    padding: 12px 14px;
+  }
+
+  .fabric-circle-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 20px 8px;
+  }
+
+  .fabric-circle {
+    width: clamp(74px, 22vw, 92px);
+    height: clamp(74px, 22vw, 92px);
+  }
+
+  .purpose-sectors-grid {
+    grid-template-columns: 1fr !important;
+    gap: 10px;
+  }
+
+  .purpose-sector-item {
+    font-size: 12px;
+    padding: 11px 14px;
+  }
+
+  .wc-tabs-nav {
+    gap: 8px;
+  }
+
+  .wc-tab-pill {
+    padding: 9px 12px;
+    font-size: 10px;
+    letter-spacing: 0.8px;
+    flex: 1 1 100%;
+  }
+
+  .wc-dynamic-display {
+    padding: 18px 16px;
+    min-height: auto;
+  }
+
+  .consultation-cta-banner {
+    align-items: center;
+    text-align: center;
+    gap: 14px;
+  }
+
+  .consultation-title {
+    font-size: 20px;
+    text-align: center;
+  }
+
+  .whatsapp-consult-btn {
+    width: auto !important;
+    max-width: 136px !important;
+    padding: 9px 14px !important;
+    font-size: 10px !important;
+    gap: 5px;
+    margin: 0 auto;
+  }
+
+  .whatsapp-icon-svg {
+    width: 14px;
+    height: 14px;
+  }
+
+  .ready-box h3 {
+    font-size: clamp(24px, 7vw, 30px);
+  }
+
+  .ready-btn {
+    width: 100%;
+    padding: 13px 18px;
+    font-size: 11px;
+  }
+
+  footer {
+    margin-top: 48px;
+    padding: 32px 16px;
+  }
+
+  .footer-links {
+    gap: 14px;
+    flex-direction: column;
+    font-size: 12px;
+  }
+}
+
+@media (max-width: 480px) {
+  header {
+    width: calc(100% - 14px);
+  }
+
+  .nav-island {
+    padding: 8px 10px;
+  }
+
+  .hamburger span {
+    width: 21px;
+  }
+
+  .account-icon {
+    width: 19px;
+    height: 19px;
+  }
+
+  .hero-banner-wrapper {
+    height: 205px;
+  }
+
+  .hero h1 {
+    font-size: clamp(26px, 9vw, 34px);
+  }
+
+  .about-us,
+  .dynamic-sub-page,
+  .services-page-layout {
+    width: calc(100% - 16px) !important;
+    margin-left: 8px !important;
+    margin-right: 8px !important;
+  }
+
+  .dynamic-sub-page,
+  .services-page-layout {
+    padding: 22px 12px !important;
+  }
+
+  .product-node-meta {
+    margin-left: 12px;
+  }
+
+  .product-node-meta p {
+    font-size: 9px;
+  }
+
+  .service-badge {
+    position: static;
+    display: inline-block;
+    margin-bottom: 8px;
+  }
+
+  .fabric-circle-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+
+  .special-offer-banner::before,
+  .wc-sparkle {
+    display: none;
+  }
+}
+
+@media (hover: none), (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: 0.15s !important;
+  }
+
+  .hero-banner-image {
+    filter: brightness(0.85);
+  }
+
+  .auth-modal-overlay {
+    backdrop-filter: none;
+  }
+
+  .special-offer-banner::before,
+  .wc-sparkle {
+    display: none !important;
+  }
+
+  .service-card:hover,
+  .fabric-circle-item:hover .fabric-circle,
+  .product-node-row:hover,
+  .special-offer-banner:hover,
+  .whatsapp-consult-btn:hover,
+  .ready-btn:hover,
+  .carousel-btn:hover {
+    transform: none !important;
+  }
+}
+
+@media(max-width: 820px) {
+  .auth-modal-overlay {
+    align-items: flex-start !important;
+    padding-top: 62px !important;
+    padding-left: 10px !important;
+    padding-right: 10px !important;
+  }
+
+  .auth-card {
+    max-height: calc(100vh - 78px) !important;
+    width: min(100%, 430px) !important;
+    padding: 26px 18px !important;
+  }
+}
+</style>
+</head>
+<body>
+
+<div class="app-viewport-wrapper">
+
+  <header>
+    <div class="header-left-zone">
+      <div class="nav-island hamburger-wrapper">
+        <div class="hamburger" id="hamburger"><span></span><span></span><span></span></div>
+      </div>
+      <div class="nav-island header-left-menu">
+        <ul class="nav-group">
+          <li><a href="javascript:void(0)" onclick="switchView('home-view')">Home</a></li>
+          <li><a href="javascript:void(0)" onclick="showAboutUs()">About Us</a></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="header-center-zone">
+      <div class="nav-island">
+        <div class="logo-text" onclick="switchView('home-view')" style="cursor:pointer;">Arlo Aven</div>
+      </div>
+    </div>
+
+    <div class="header-right-zone">
+      <div class="nav-island header-right-menu">
+        <ul class="nav-group">
+          <li><a href="javascript:void(0)" onclick="switchView('products-view')">Products</a></li>
+          <li><a href="javascript:void(0)" onclick="switchView('services-view')">Services</a></li>
+        </ul>
+      </div>
+      <div class="nav-island">
+        <div class="account-button" onclick="openAuthModal()" title="Account Portal">
+          <svg class="account-icon" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="12" cy="7" r="4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+      </div>
+    </div>
+
+    <ul class="mobile-nav-links" id="mobile-nav">
+      <li><a href="javascript:void(0)" onclick="switchView('home-view')">Home</a></li>
+      <li><a href="javascript:void(0)" onclick="showAboutUs()">About Us</a></li>
+      <li><a href="javascript:void(0)" onclick="switchView('products-view')">Products</a></li>
+      <li><a href="javascript:void(0)" onclick="switchView('services-view')">Services</a></li>
+    </ul>
+  </header>
+
+  <div class="auth-modal-overlay" id="authOverlay" onclick="closeAuthModal()">
+    <div class="auth-card" onclick="event.stopPropagation()">
+      <button class="close-modal-btn" onclick="closeAuthModal()">×</button>
+
+      <div id="loginFormBlock" class="auth-form-block active-form">
+        <h3>Client Inquiry</h3>
+        <form onsubmit="handleInquirySubmit(event)">
+          <div class="auth-form-group">
+            <label>Full Name</label>
+            <input type="text" name="full_name" required placeholder="Your full name">
+          </div>
+          <div class="auth-form-group">
+            <label>Email Address</label>
+            <input type="email" name="email" required placeholder="name@domain.com">
+          </div>
+          <div class="auth-form-group">
+            <label>Phone Number</label>
+            <input type="tel" name="phone" required placeholder="+961 00 000 000">
+          </div>
+          <div class="auth-form-group">
+            <label>Product Type</label>
+            <input type="text" name="product_type" required placeholder="Example: caps, jerseys, uniforms, hoodies, scrubs">
+          </div>
+          <div class="auth-form-group">
+            <label>Service Needed</label>
+            <input type="text" name="service_needed" required placeholder="Example: stitching, printing, labeling, full production">
+          </div>
+          <div class="auth-form-group">
+            <label>Estimated Quantity</label>
+            <input type="number" name="quantity" min="20" required placeholder="Minimum 20 pieces">
+          </div>
+          <div class="auth-form-group">
+            <label>Fabric Type</label>
+            <input type="text" name="fabric_type" required placeholder="Example: cotton, polyester, denim, fleece, jersey">
+          </div>
+          <div class="auth-form-group">
+            <label>Fabric Percentage / Blend</label>
+            <input type="text" name="fabric_percentage" required placeholder="Example: 80% cotton / 20% polyester">
+          </div>
+          <div class="auth-form-group">
+            <label>Dimensions</label>
+            <input type="text" name="dimensions" placeholder="Example: length, width, sleeve, inseam, cap size, etc.">
+          </div>
+          <div class="auth-form-group">
+            <label>Sizing Details</label>
+            <textarea name="sizing_details" required placeholder="Mention sizes, size range, fit preference, measurements, or size chart details."></textarea>
+          </div>
+          <div class="auth-form-group">
+            <label>Branding Details</label>
+            <textarea name="branding_details" required placeholder="Mention logo placement, printing, embroidery, labels, packaging, tags, or finishing details."></textarea>
+          </div>
+          <div class="auth-form-group">
+            <label>Project Details</label>
+            <textarea name="project_details" required placeholder="Tell us about your deadline, product idea, special requirements, color palette, and production expectations."></textarea>
+          </div>
+          <div class="auth-form-group">
+            <label>Upload PDF / Image / Reference File</label>
+            <input type="file" name="reference_file" accept=".pdf,image/*">
+          </div>
+          <button type="submit" class="auth-submit-btn">Submit Production Request</button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <div class="main-content-canvas">
+    <div id="home-view" class="view-panel active-view">
+      <section class="hero-banner-wrapper">
+        <img src="/images/hero.jpg" class="hero-banner-image" alt="Arlo Aven Design Studio Feature">
+        <div class="banner-cta-container">
+          <a onclick="switchView('products-view')" class="carousel-btn">Order Now</a>
+        </div>
+      </section>
+
+      <div class="creative-parallax-divider"></div>
+
+      <section class="hero">
+        <h1><span>Your Vision.</span><span>Our Thread.</span><span>Endless Possibilities.</span></h1>
+        <form id="email-form" onsubmit="handleSubscribe(event)">
+          <input type="email" placeholder="Enter your email" required>
+          <button type="submit">Subscribe</button>
+        </form>
+      </section>
+
+      <div class="creative-section-divider">
+        <div class="divider-line-left"></div>
+        <div class="divider-center-spec">
+          <div class="spec-box"></div>
+          <div class="spec-cross">✚</div>
+          <div class="spec-box filled"></div>
+          <div class="spec-cross">✚</div>
+          <div class="spec-box"></div>
+        </div>
+        <div class="divider-line-right"></div>
+      </div>
+
+      <section class="about-us" id="about-us-section">
+        <div class="about-text">
+          <h2>ABOUT US</h2>
+          <p><strong>Double A: Accurate & Adaptable. At Arlo Aven, we bring your ideas to life with precision and creativity. As a full-service manufacturing company, we handle all types of apparel, footwear, and accessories. Accurate in every detail, adaptable to every project, Arlo Aven is your partner in turning concepts into finished products that resonate with your audience.</strong></p>
+        </div>
+        <div class="about-image">
+          <img src="/images/about.jpg" alt="About Arlo Aven Featured Workspace">
+        </div>
+      </section>
+    </div>
+
+    <div id="products-view" class="view-panel">
+      <main class="dynamic-sub-page" style="padding-top:80px; padding-bottom:120px;">
+        <h2 style="text-align: center; margin-bottom: 40px; letter-spacing: 1px;">If you can wear it, we can create it.</h2>
+        <div class="product-matrix-container">
+          <div class="product-node-row" onclick="switchView('services-view')">
+            <div class="product-circle"><svg class="product-sketch-icon" viewBox="0 0 24 24"><path d="M3 18h18M5 18a7 7 0 0 1 14 0M12 4v7M9 5h6"/></svg></div>
+            <div class="product-node-meta"><h4>Headwear</h4><p>Caps, Beanies, Beach & Cowboy Hats</p></div>
+          </div>
+          <div class="product-node-row" onclick="switchView('services-view')">
+            <div class="product-circle"><svg class="product-sketch-icon" viewBox="0 0 24 24"><path d="M6 6h12v12H6zM10 18v3M14 18v3M6 10h12M6 14h12"/></svg></div>
+            <div class="product-node-meta"><h4>Scarves</h4><p>Premium Woven Neckwear</p></div>
+          </div>
+          <div class="product-node-row" onclick="switchView('services-view')">
+            <div class="product-circle"><svg class="product-sketch-icon" viewBox="0 0 24 24"><path d="M12 20C6 20 3 14 3 14M12 20C18 20 21 14 21 14M12 20V11M6 16.5l6-5.5M18 16.5l-6-5.5"/></svg></div>
+            <div class="product-node-meta"><h4>Fans</h4><p>Artisanal Brand Accessories</p></div>
+          </div>
+          <div class="product-node-row" onclick="switchView('services-view')">
+            <div class="product-circle"><svg class="product-sketch-icon" viewBox="0 0 24 24"><path d="M6 4L3 8v3h3v9h12v-9h3V8l-3-4h-4a3 3 0 0 1-6 0H6z"/></svg></div>
+            <div class="product-node-meta"><h4>T-Shirts</h4><p>Heavyweight Luxury Blanks</p></div>
+          </div>
+          <div class="product-node-row" onclick="switchView('services-view')">
+            <div class="product-circle"><svg class="product-sketch-icon" viewBox="0 0 24 24"><path d="M4 4l3 6M20 4l-3 6M7 4h10v16H7V4zM12 4v16M7 8h10"/></svg></div>
+            <div class="product-node-meta"><h4>Jackets</h4><p>Cut & Sew Outerwear Layers</p></div>
+          </div>
+          <div class="product-node-row" onclick="switchView('services-view')">
+            <div class="product-circle"><svg class="product-sketch-icon" viewBox="0 0 24 24"><path d="M5 4l-2 5h4v11h10V9h4l-2-5h-3a3 3 0 0 1-6 0H5zM8 12h8M12 9v5"/></svg></div>
+            <div class="product-node-meta"><h4>Jerseys</h4><p>High Performance Athletics</p></div>
+          </div>
+          <div class="product-node-row" onclick="switchView('services-view')">
+            <div class="product-circle"><svg class="product-sketch-icon" viewBox="0 0 24 24"><path d="M8 4h8l2 16h-5l-1-7-1 7H6L8 4zM8 7h8"/></svg></div>
+            <div class="product-node-meta"><h4>Pants</h4><p>Tailored Technical Trousers</p></div>
+          </div>
+          <div class="product-node-row" onclick="switchView('services-view')">
+            <div class="product-circle"><svg class="product-sketch-icon" viewBox="0 0 24 24"><path d="M8 4h8l1 7v9h-4v-6h-2v6H7v-9l1-7zM8 8h8M12 4v4"/></svg></div>
+            <div class="product-node-meta"><h4>Shorts</h4><p>Athletic, Casual & Performance Shorts</p></div>
+          </div>
+          <div class="product-node-row" onclick="switchView('services-view')">
+            <div class="product-circle"><svg class="product-sketch-icon" viewBox="0 0 24 24"><path d="M8 4h8l1.5 16h-4.5v-6h-4v6H5.5L7 4zM7 8h10M10 4v4M14 4v4"/></svg></div>
+            <div class="product-node-meta"><h4>Jeans</h4><p>Premium Selvedge Denim Lines</p></div>
+          </div>
+          <div class="product-node-row" onclick="switchView('services-view')">
+            <div class="product-circle"><svg class="product-sketch-icon" viewBox="0 0 24 24"><path d="M12 4v4m-2-2h4M4 8h16v4s-2 1-4 1s-4-2-4-2s-2 1-4 1s-4-1-4-1V8zm2 4v7h12v-7"/></svg></div>
+            <div class="product-node-meta"><h4>Medical Wear</h4><p>Scrubs, Healthcare Uniforms & Clinical Apparel</p></div>
+          </div>
+          <div class="product-node-row" onclick="switchView('services-view')">
+            <div class="product-circle"><svg class="product-sketch-icon" viewBox="0 0 24 24"><path d="M8 3h8l2 5v13H6V8l2-5zM10 3v5M14 3v5M8 12h8M10 16h2M14 16h2"/></svg></div>
+            <div class="product-node-meta"><h4>Lab Coats</h4><p>Medical, Scientific & Professional Laboratory Wear</p></div>
+          </div>
+          <div class="product-node-row" onclick="switchView('services-view')">
+            <div class="product-circle"><svg class="product-sketch-icon" viewBox="0 0 24 24"><path d="M7 4h4v10l3 2v4H7V4zM13 6h4v10l3 2v4h-7V6z"/></svg></div>
+            <div class="product-node-meta"><h4>Socks</h4><p>High Density Cushioned Hosiery</p></div>
+          </div>
+          <div class="product-node-row" onclick="switchView('services-view')">
+            <div class="product-circle"><svg class="product-sketch-icon" viewBox="0 0 24 24"><path d="M4 16l3-8h5l7 4v4H4zM12 8v4M7 16h10M4 13h4"/></svg></div>
+            <div class="product-node-meta"><h4>Footwear</h4><p>Bespoke Sneakers, Shoes & Boots</p></div>
+          </div>
+        </div>
+      </main>
+    </div>
+
+    <div id="services-view" class="view-panel">
+      <main class="dynamic-sub-page services-page-layout">
+        <div class="brand-quote-container">
+          <p class="brand-quote-text">"From Our Brand to Yours."</p>
+          <p class="brand-quote-moq">Minimum Order Quantity: 20 Pieces</p>
+        </div>
+
+        <div class="services-grid-layout">
+          <div class="service-card" onclick="openAuthModal()">
+            <div class="service-badge">Construction</div>
+            <h3 style="color: var(--accent-gold); font-family: 'Cormorant Garamond', serif;">Stitching</h3>
+            <p style="text-align: justify;">Our state-of-the-art facility combines premium structural craftsmanship with high-capacity equipment. We handle everything from heavy-duty raw denim assembly to delicate luxury knit structures, safeguarding exceptional durability and fluid geometric fitment for each pattern outline.</p>
+            <div class="service-card-footer-notice"><span>✚</span> Precision Assembly</div>
+          </div>
+          <div class="service-card" onclick="openAuthModal()">
+            <div class="service-badge">Graphics</div>
+            <h3 style="color: var(--accent-gold); font-family: 'Cormorant Garamond', serif;">Printing</h3>
+            <p style="text-align: justify;">Bring complex visual concepts to life with high-definition screen printing, advanced premium sublimation, and precision digital direct-to-garment applications. We utilize rich, long-lasting industrial inks engineered to maintain hyper-sharp tonal detail and color hold across heavy usage cycles.</p>
+            <div class="service-card-footer-notice"><span>✚</span> Chromatic Definition</div>
+          </div>
+          <div class="service-card" onclick="openAuthModal()">
+            <div class="service-badge">Identity</div>
+            <h3 style="color: var(--accent-gold); font-family: 'Cormorant Garamond', serif;">Labeling</h3>
+            <p style="text-align: justify;">Secure commercial market readiness with specialized bespoke finishes. We design and integrate fine woven labels, high-density silicone neck prints, and multi-layered informational hang tags. Every accent is carefully anchored to convey clear luxury positioning on boutique retail displays.</p>
+            <div class="service-card-footer-notice"><span>✚</span> Brand Infrastructure</div>
+          </div>
+        </div>
+
+        <div class="creative-section-divider">
+          <div class="divider-line-left"></div>
+          <div class="divider-center-spec">
+            <div class="spec-box"></div>
+            <div class="spec-cross">✚</div>
+            <div class="spec-box filled"></div>
+            <div class="spec-cross">✚</div>
+            <div class="spec-box"></div>
+          </div>
+          <div class="divider-line-right"></div>
+        </div>
+
+        <section class="fabric-showcase-section">
+          <h3 class="fabric-showcase-title">Fabric Library</h3>
+          <p class="fabric-showcase-subtitle">Choose from a wide range of fabric bases depending on the product, texture, stretch, weight, durability, and final look you want to achieve.</p>
+          <div class="fabric-percentage-line">Customizable Percentage Of Every Blend</div>
+
+          <div class="fabric-circle-grid">
+            <div class="fabric-circle-item"><div class="fabric-circle fabric-cotton"></div><span>Cotton</span></div>
+            <div class="fabric-circle-item"><div class="fabric-circle fabric-polyester"></div><span>Polyester</span></div>
+            <div class="fabric-circle-item"><div class="fabric-circle fabric-nylon"></div><span>Nylon</span></div>
+            <div class="fabric-circle-item"><div class="fabric-circle fabric-linen"></div><span>Linen</span></div>
+            <div class="fabric-circle-item"><div class="fabric-circle fabric-denim"></div><span>Denim</span></div>
+            <div class="fabric-circle-item"><div class="fabric-circle fabric-fleece"></div><span>Fleece</span></div>
+            <div class="fabric-circle-item"><div class="fabric-circle fabric-jersey"></div><span>Jersey</span></div>
+            <div class="fabric-circle-item"><div class="fabric-circle fabric-rib"></div><span>Rib Knit</span></div>
+            <div class="fabric-circle-item"><div class="fabric-circle fabric-cashmere"></div><span>Cashmere</span></div>
+            <div class="fabric-circle-item"><div class="fabric-circle fabric-suede"></div><span>Suede</span></div>
+          </div>
+        </section>
+
+        <div class="creative-section-divider">
+          <div class="divider-line-left"></div>
+          <div class="divider-center-spec">
+            <div class="spec-box"></div>
+            <div class="spec-cross">✚</div>
+            <div class="spec-box filled"></div>
+            <div class="spec-cross">✚</div>
+            <div class="spec-box"></div>
+          </div>
+          <div class="divider-line-right"></div>
+        </div>
+
+        <div class="purpose-sectors-container">
+          <h3 class="purpose-sectors-title">Industry Sectors</h3>
+          <div class="purpose-sectors-grid">
+            <div class="purpose-sector-item">Youth Organisations</div>
+            <div class="purpose-sector-item">Graduation Gowns & Caps</div>
+            <div class="purpose-sector-item">Senior & Class Milestones</div>
+            <div class="purpose-sector-item">Hosting & Hospitality Agencies</div>
+            <div class="purpose-sector-item">Hostessing & Event Crew</div>
+            <div class="purpose-sector-item">Corporate Uniforms & Workwear</div>
+            <div class="purpose-sector-item">Medical Wear & Scrubs</div>
+            <div class="purpose-sector-item">Athleisure & Loungewear</div>
+            <div class="purpose-sector-item">Sports Teams & Athletics</div>
+            <div class="purpose-sector-item">Independent Fashion Labels</div>
+            <div class="purpose-sector-item">Merchandise & Promotional Gear</div>
+          </div>
+        </div>
+
+        <div class="creative-section-divider">
+          <div class="divider-line-left"></div>
+          <div class="divider-center-spec">
+            <div class="spec-box"></div>
+            <div class="spec-cross">✚</div>
+            <div class="spec-box filled"></div>
+            <div class="spec-cross">✚</div>
+            <div class="spec-box"></div>
+          </div>
+          <div class="divider-line-right"></div>
+        </div>
+
+        <div class="special-offer-banner">
+          <div class="wc-sparkle sp-1">✦</div>
+          <div class="wc-sparkle sp-2">✦</div>
+          <div class="wc-sparkle sp-3">✦</div>
+          <h3 class="purpose-sectors-title" style="color: var(--accent-gold); margin-bottom: 10px; font-weight: 600; text-shadow: 0 0 10px rgba(193,184,152,0.4);">Special Offer: World Cup Attire</h3>
+          <p style="text-align: justify; padding: 0 20px; line-height: 1.8; margin: 0;">We are proud to offer an exclusive manufacturing line dedicated to World Cup attire. We specialize in producing high-fidelity jerseys, commemorative apparel, and supporter gear that meet the rigorous global standards of international football events.</p>
+          <div class="wc-interactive-container">
+            <div class="wc-tabs-nav">
+              <button class="wc-tab-pill active-wc-pill" onclick="handleWCTabSwitch(0, this)">High-Fidelity Jerseys</button>
+              <button class="wc-tab-pill" onclick="handleWCTabSwitch(1, this)">Commemorative Apparel</button>
+              <button class="wc-tab-pill" onclick="handleWCTabSwitch(2, this)">Supporter Kits</button>
+            </div>
+            <div class="wc-dynamic-display">
+              <p id="wc-display-text">Engineered with ultra-lightweight, moisture-wicking aerodynamic technical fabrics, customized laser-cut ventilation zones, and high-definition crest embroidery tailored for major tournament play.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="ready-box">
+          <h3>Whenever You're Ready</h3>
+          <p>Start your production request by submitting your product details, fabric choice, blend percentage, sizing, dimensions, branding needs, and reference files. Our team will review your request and guide you through the next step.</p>
+          <button onclick="openAuthModal()" class="ready-btn">Start My Project</button>
+        </div>
+
+        <div class="consultation-cta-banner">
+          <div class="consultation-text-wrapper">
+            <h4 class="consultation-title">Need a Personal Consultation?</h4>
+          </div>
+          <a href="https://wa.me/96179195178" target="_blank" rel="noopener noreferrer" class="whatsapp-consult-btn">
+            <svg class="whatsapp-icon-svg" viewBox="0 0 24 24">
+              <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.591 5.52 0 10.002-4.48 10.002-10.001 0-5.52-4.482-10.002-10.002-10.002-5.521 0-10.002 4.482-10.002 10.002 0 1.62.394 3.203 1.139 4.604l-.738 2.696 2.766-.725z"/>
+            </svg>
+            WhatsApp +961 79 195 178
+          </a>
+        </div>
+      </main>
+    </div>
+    
+    <div id="tools-view" class="view-panel">
+      <main class="dynamic-sub-page">
+        <h2>Order Tools</h2>
+        <p>Production optimization management tools and dynamic tracking portals will load here.</p>
+      </main>
+    </div>
+  </div>
+
+  <footer>
+    <div class="footer-logo">Arlo Aven</div>
+    <ul class="footer-links">
+      <li><a href="javascript:void(0)" onclick="switchView('home-view')">Home</a></li>
+      <li><a href="javascript:void(0)" onclick="showAboutUs()">About Us</a></li>
+      <li><a href="javascript:void(0)" onclick="switchView('products-view')">Products</a></li>
+      <li><a href="javascript:void(0)" onclick="switchView('services-view')">Services</a></li>
+    </ul>
+    <div class="footer-line"></div>
+    <div class="est-date">EST. 2023</div>
+    <p class="copyright-text">© 2023 Arlo Aven. All rights reserved.</p>
+  </footer>
+
+</div>
+
+<script>
+  const API_URL = "http://localhost:3000";
+
+  function switchView(viewId, scrollToTop = true) {
+    const targetView = document.getElementById(viewId);
+    const mobileNav = document.getElementById('mobile-nav');
+
+    if (!targetView) return;
+
+    document.querySelectorAll('.view-panel').forEach(view => {
+      view.classList.remove('active-view');
+    });
+
+    targetView.classList.add('active-view');
+
+    if (mobileNav) {
+      mobileNav.classList.remove('show');
+    }
+
+    if (scrollToTop) {
+      window.scrollTo({ top: 0, behavior: 'auto' });
+    }
+  }
+
+  function showAboutUs() {
+    const homeView = document.getElementById('home-view');
+    const aboutSection = document.getElementById('about-us-section');
+    const mobileNav = document.getElementById('mobile-nav');
+
+    document.querySelectorAll('.view-panel').forEach(view => {
+      view.classList.remove('active-view');
+    });
+
+    if (homeView) {
+      homeView.classList.add('active-view');
+    }
+
+    if (mobileNav) {
+      mobileNav.classList.remove('show');
+    }
+
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        if (!aboutSection) return;
+
+        const header = document.querySelector('header');
+        const headerHeight = header ? header.offsetHeight : 80;
+        const sectionTop = aboutSection.offsetTop;
+        const finalTop = Math.max(sectionTop - headerHeight - 28, 0);
+
+        window.scrollTo({
+          top: finalTop,
+          behavior: 'auto'
+        });
+      });
+    });
+  }
+
+  function openAuthModal() {
+    document.getElementById('authOverlay').classList.add('active-modal');
+  }
+
+  function closeAuthModal() {
+    document.getElementById('authOverlay').classList.remove('active-modal');
+  }
+
+  document.getElementById('hamburger').addEventListener('click', () => {
+    document.getElementById('mobile-nav').classList.toggle('show');
+  });
+
+  function handleWCTabSwitch(index, element) {
+    const dataDetails = [
+      "Engineered with ultra-lightweight, moisture-wicking aerodynamic technical fabrics, customized laser-cut ventilation zones, and high-definition crest embroidery tailored for major tournament play.",
+      "Premium heavy-brushed cotton warm-up suites, limited-edition tailored coaches jackets, and woven commemorative satin scarves engineered to capture lasting sports legacies.",
+      "High-volume, durable supporter kit jerseys, custom structured panel caps, and branded dual-layered tournament accessories optimized for global enthusiast distribution."
+    ];
+
+    document.querySelectorAll('.wc-tab-pill').forEach(pill => pill.classList.remove('active-wc-pill'));
+    element.classList.add('active-wc-pill');
+
+    const textNode = document.getElementById('wc-display-text');
+    textNode.style.opacity = '0';
+    textNode.style.transform = 'translateY(5px)';
+
+    setTimeout(() => {
+      textNode.textContent = dataDetails[index];
+      textNode.style.opacity = '1';
+      textNode.style.transform = 'translateY(0)';
+    }, 250);
+  }
+
+  async function handleSubscribe(event) {
+    event.preventDefault();
+
+    const emailInput = event.target.querySelector('input[type="email"]');
+    const email = emailInput.value.trim();
+
+    if (!email) {
+      alert('Please enter your email.');
+      return;
+    }
+
+    try {
+      const response = await fetch(`${API_URL}/api/subscribe`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ email })
+      });
+
+      const data = await response.json();
+      alert(data.message);
+
+      if (response.ok) {
+        emailInput.value = '';
+      }
+    } catch (error) {
+      alert('Backend is not running. Please start the server.');
+    }
+  }
+
+  async function handleInquirySubmit(event) {
+    event.preventDefault();
+
+    const form = event.target;
+    const formData = new FormData(form);
+
+    try {
+      const response = await fetch(`${API_URL}/api/orders`, {
+        method: 'POST',
+        body: formData
+      });
+
+      const data = await response.json();
+      alert(data.message);
+
+      if (response.ok) {
+        form.reset();
+        closeAuthModal();
+      }
+    } catch (error) {
+      alert('Backend is not running. Please start the server.');
+    }
+  }
+</script>
+</body>
+</html>
